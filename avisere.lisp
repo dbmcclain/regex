@@ -9,7 +9,9 @@
 
 (in-package "AVISERE")
 
-(lw:load-system "csv")
+;; (lw:load-system "csv")
+(ql:quickload :csv)
+(ql:quickload :vmath)
 
 (defclass <channel-moments-group> ()
   ((its-frm    :accessor its-frm  :initarg :frm)
@@ -49,8 +51,9 @@
   (setf grp-LH2 (read-hh-file (um:mkstr *hh-path* "LH2.csv")))
   (setf grp-LL  (read-hh-file (um:mkstr *hh-path* "LL.csv")))
   (setf grp-LL2 (read-hh-file (um:mkstr *hh-path* "LL2.csv"))))
+|#
 
-(lw:compile-system "vmath" :load t)
+;; (lw:compile-system "vmath" :load t)
 
 (defun combine (truth &rest args)
   (apply #'map 'vector #'list truth args))
