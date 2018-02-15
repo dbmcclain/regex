@@ -9,7 +9,9 @@
 
 (in-package "AVISERE")
 
-(lw:load-system "csv")
+;; (lw:load-system "csv")
+(ql:quickload :csv)
+(ql:quickload :vmath)
 
 (defclass <channel-moments-group> ()
   ((its-frm    :accessor its-frm  :initarg :frm)
@@ -21,7 +23,7 @@
 
 (defun read-hh-file (&optional fname)
   (format t "~%Reading From: ~A" fname)
-  (let ((raw (csv:read-csv :hdr-lines 1 :fname fname)))
+  (let ((raw (csv:read-file :hdr-lines 1 :fname fname)))
     (when raw
       (let ((grp (csv:get-group nil raw)))
         (labels ((get-numeric-column (hdg)
@@ -37,6 +39,7 @@
           ))
       )))
 
+ 
 ;; NOTE: All CSV files must have the same identically spelled 
 ;; column headings. Use Emacs to ensure that they do...
 (defvar *hh-path* "~/Avisere/CSV\ Data/")
@@ -49,8 +52,9 @@
   (setf grp-LH2 (read-hh-file (um:mkstr *hh-path* "LH2.csv")))
   (setf grp-LL  (read-hh-file (um:mkstr *hh-path* "LL.csv")))
   (setf grp-LL2 (read-hh-file (um:mkstr *hh-path* "LL2.csv"))))
+ 
 
-(lw:compile-system "vmath" :load t)
+;; (lw:compile-system "vmath" :load t)
 
 (defun combine (truth &rest args)
   (apply #'map 'vector #'list truth args))
@@ -72,7 +76,7 @@
   (let* ((all   (combine truth v1 v2))
          (pres  (select all 1))
          (npres (select all 0))
-         (plotter #'sg:plot))
+         (plotter #'plt:plot))
     (labels ((xs (grp)
                (map 'vector #'second grp))
              (ys (grp)
@@ -80,17 +84,17 @@
              (show (grp color)
                (apply plotter (xs grp) (ys grp)
                         :color color
-                        :symbol sg:$sym-dot
+                        :symbol :circle 
                         :xtitle xtitle
                         :ytitle ytitle
                         :title  title
                         other-args)
-               (setf plotter #'sg:oplot))
+               (setf plotter #'plt::oplot2)) 
              (show-pres ()
-               (show pres sg:$darkgreen))
+               (show pres :darkgreen)) 
              (show-npres ()
-               (show npres sg:$red)))
-      (sg:wset wid)
+               (show npres :red))) 
+      (plt:wset wid)    
       (if (> (length pres) (length npres))
           (progn
             (show-pres)
@@ -155,9 +159,9 @@
 (loop for grp in (list grp-HH ;;grp-HH2 grp-HL grp-HL2
                        ;;grp-LH grp-LH2 grp-LL grp-LL2) 
                        ) do
-      (sg:wset 0)
-      (sg:plot (its-frm grp) (its-gnd grp)
-               :color sg:$red  :symbol sg:$sym-dot
+      (plt:wset 0)
+      (plt:plot (its-frm grp) (its-gnd grp)
+               :color :red  :symbol :circle
                :xtitle "Frame"
                :ytitle "Ground Truth"
                :title  "Frame & Ground Truth Overview")
