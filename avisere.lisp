@@ -23,7 +23,7 @@
 
 (defun read-hh-file (&optional fname)
   (format t "~%Reading From: ~A" fname)
-  (let ((raw (csv:read-csv :hdr-lines 1 :fname fname)))
+  (let ((raw (csv:read-file :hdr-lines 1 :fname fname)))
     (when raw
       (let ((grp (csv:get-group nil raw)))
         (labels ((get-numeric-column (hdg)
